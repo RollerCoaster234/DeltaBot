@@ -36,6 +36,13 @@ namespace timer
     class TimerConfiguration
     {
     public:
+        enum TimerCounter
+        {
+            Timer0,
+            Timer1,
+            Timer2
+        };
+
         enum TimerMode
         {
             Nomal,
@@ -92,6 +99,9 @@ namespace timer
         void SetInterruptFunction(void *func);
         const void *GetInterruptFunction() const;
 
+        void SetTimer(const TimerCounter &timerCounter);
+        TimerCounter &GetTimer() const;
+
         TimerConfiguration();
         TimerConfiguration(const TimerConfiguration &toCopy);
         ~TimerConfiguration();
@@ -102,6 +112,7 @@ namespace timer
         uint8_t *m_outputHardwarePinsArr;
 
         uint64_t m_count;
+        TimerCounter m_timer;
 
         ClockSource m_clockSrc;
         TimerMode m_TimerType;
@@ -113,33 +124,24 @@ namespace timer
     class Timer
     {
     public:
-        enum TimerCounter
-        {
-            Timer0,
-            Timer1,
-            Timer2
-        };
+
 
         void SetTimerConfiguration(const TimerConfiguration &config);
         TimerConfiguration &GetTimerConfiguration();
-
-        void SetTimer(const TimerCounter &timerCounter);
-        TimerCounter &GetTimer() const;
 
         void StartTimer();
         void StopTimer();
         void ResetTimer();
 
-        Timer() = default; // default constructor
-        Timer(const TimerCounter &timerCounter, const TimerConfiguration &config);
+        // Timer() = default; // default constructor
+        Timer(const TimerConfiguration &config);
         Timer(const Timer &) = delete; // disallow the copy constructor due to hardware limitations
-        ~Timer();
+        // ~Timer();
 
     private:
         virtual void ArmTimer();
         virtual void DisarmTimer();
 
-        TimerCounter m_timer;
         TimerConfiguration m_timerConfig;
         uint8_t *RegisterA;
         uint8_t *RegisterB;
@@ -161,18 +163,18 @@ namespace timer
         static const uint8_t Timer2OutputPins[2] = {TIMER2A, TIMER2B};
 
         static inline bool
-        CheckIfPinIsHardwareTimerOutput(Timer::TimerCounter timer, int pin)
+        CheckIfPinIsHardwareTimerOutput(TimerConfiguration::TimerCounter timer, int pin)
         {
             uint8_t* timerPins = nullptr;
             switch (timer)
             {
-            case Timer::TimerCounter::Timer0:
+            case TimerConfiguration::TimerCounter::Timer0:
                 timerPins = const_cast<uint8_t*>(Timer0OutputPins);
                 break;
-            case Timer::TimerCounter::Timer1:
+            case TimerConfiguration::TimerCounter::Timer1:
                 timerPins = const_cast<uint8_t*>(Timer1OutputPins);
                 break;
-            case Timer::TimerCounter::Timer2:
+            case TimerConfiguration::TimerCounter::Timer2:
                 timerPins = const_cast<uint8_t*>(Timer2OutputPins);
                 break;
             default:
@@ -181,7 +183,7 @@ namespace timer
 
             for (size_t i = 0; i < 2; i++)
             {
-                if (timerPins[i] == pin)
+                if (timerPins[i] == digitalPinToTimer(pin))
                     return true;
             }
             return false;

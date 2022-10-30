@@ -8,8 +8,26 @@ namespace timer
 
     void TimerConfiguration::SetOutputPins(uint8_t *outputPinsArray)
     {
-        
+        int i = 0;
+        int softPinsArr[10] = {-1};
+        int hardPinsArr[10] = {-1};
+        Serial.println("tried timer " + String(m_timer));
+        while (outputPinsArray[i] != NULL)
+        {
+            if (TimerPinUtils::CheckIfPinIsHardwareTimerOutput(m_timer, outputPinsArray[i]))
+            {
+                Serial.println(String(outputPinsArray[i]) + " true");
+            }
+            else
+            {
+                Serial.println(String(outputPinsArray[i]) + " false");
+            }
+
+            i++;
+        }
+        Serial.println("fin");
     }
+
     const uint8_t *TimerConfiguration::GetOutputPins() const
     {
     }
@@ -81,11 +99,13 @@ namespace timer
     {
     }
 
-    void Timer::SetTimer(const Timer::TimerCounter &timerCounter)
+    void TimerConfiguration::SetTimer(const TimerConfiguration::TimerCounter &timerCounter)
     {
+        Serial.println("timeeer");
+        m_timer = timerCounter;
     }
 
-    Timer::TimerCounter &Timer::GetTimer() const
+    TimerConfiguration::TimerCounter &TimerConfiguration::GetTimer() const
     {
     }
 
@@ -99,11 +119,11 @@ namespace timer
     {
     }
 
-    Timer::Timer(const Timer::TimerCounter &timerCounter, const TimerConfiguration &config)
+    Timer::Timer(const TimerConfiguration &config)
     {
     }
 
-    Timer::~Timer()
-    {
-    }
+    // Timer::~Timer()
+    // {
+    // }
 }
