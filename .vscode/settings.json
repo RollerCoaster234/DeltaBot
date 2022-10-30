@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "arduino.h": "c",
+        "binary.h": "c",
+        "stdlib.h": "c",
+        "math.h": "c",
+        "pins_arduino.h": "c",
+        "pgmspace.h": "c"
+    }
+}
